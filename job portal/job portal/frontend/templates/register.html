@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Register | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 760px; margin-top: 40px;">
+  <div class="form-panel">
+    <h2 style="margin-top: 0;">Create your JobConnect account</h2>
+    <p style="color: var(--muted);">Registration is free and takes only a minute.</p>
+    <form method="POST">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Full Name<input type="text" name="full_name" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Username<input type="text" name="username" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Email<input type="email" name="email" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Phone Number<input type="text" name="phone" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Password<input type="password" name="password" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Confirm Password<input type="password" name="confirm_password" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Location<input type="text" name="location" required /></label>
+        </div>
+        <div class="form-row">
+          <label>User Type
+            <select name="user_type" required>
+              <option value="job_seeker">Job Seeker</option>
+              <option value="recruiter">Recruiter</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Register</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+
+

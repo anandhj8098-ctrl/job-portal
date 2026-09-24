@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}JobConnect{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='8') }}" />
+  </head>
+  <body>
+    {% set active = request.endpoint or '' %}
+    <div class="page-shell {% if current_user %}signed-in{% else %}guest-shell{% endif %}">
+      {% if current_user %}
+      <aside class="sidebar" id="sidebar">
+        <a class="brand-wrap" href="{{ url_for('dashboard') }}" aria-label="JobConnect dashboard">
+          <span class="brand-mark">JC</span>
+          <span><span class="brand-name">JobConnect</span><span class="brand-tag">Your Next Opportunity</span></span>
+        </a>
+
+        <nav class="sidebar-nav" aria-label="Main navigation">
+          <p class="nav-label">Workspace</p>
+          <a class="nav-link {% if active == 'dashboard' %}active{% endif %}" href="{{ url_for('dashboard') }}"><span class="nav-icon">⌂</span>Dashboard</a>
+          {% if current_user.role == 'job_seeker' %}
+          <a class="nav-link {% if active == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}"><span class="nav-icon">♙</span>My Profile</a>
+          <a class="nav-link {% if active == 'jobs' or active == 'search_results' or active == 'job_detail' %}active{% endif %}" href="{{ url_for('jobs') }}"><span class="nav-icon">⌕</span>Find Jobs</a>
+          <a class="nav-link {% if active == 'saved_jobs' %}active{% endif %}" href="{{ url_for('saved_jobs') }}"><span class="nav-icon">♡</span>Saved Jobs</a>
+          <a class="nav-link {% if active == 'applications_page' or active == 'application_detail' %}active{% endif %}" href="{{ url_for('applications_page') }}"><span class="nav-icon">▣</span>Applications</a>
+          <a class="nav-link {% if active == 'interviews_page' or active == 'interview_detail' %}active{% endif %}" href="{{ url_for('interviews_page') }}"><span class="nav-icon">□</span>Interviews</a>
+          <a class="nav-link {% if active == 'resume_management' %}active{% endif %}" href="{{ url_for('resume_management') }}"><span class="nav-icon">▤</span>Resume</a>
+          <a class="nav-link {% if active == 'job_alerts' %}active{% endif %}" href="{{ url_for('job_alerts') }}"><span class="nav-icon">◉</span>Job Alerts</a>
+          {% elif current_user.role == 'recruiter' %}
+          <a class="nav-link {% if active == 'recruiter_jobs' %}active{% endif %}" href="{{ url_for('recruiter_jobs') }}"><span class="nav-icon">▣</span>My Job Posts</a>
+          <a class="nav-link {% if active == 'recruiter_applicants' %}active{% endif %}" href="{{ url_for('recruiter_applicants') }}"><span class="nav-icon">♙</span>Candidates</a>
+          <a class="nav-link {% if active == 'profile' %}active{% endif %}" href="{{ url_for('profile') }}"><span class="nav-icon">◉</span>My Profile</a>
+          {% else %}
+          <a class="nav-link {% if active == 'admin_users' %}active{% endif %}" href="{{ url_for('admin_users') }}"><span class="nav-icon">♙</span>Users</a>
+          <a class="nav-link {% if active == 'admin_jobs' %}active{% endif %}" href="{{ url_for('admin_jobs') }}"><span class="nav-icon">▣</span>Job Listings</a>
+          {% endif %}
+        </nav>
+
+        <div class="sidebar-bottom">
+          <a class="nav-link {% if active == 'notifications_page' %}active{% endif %}" href="{{ url_for('notifications_page') }}"><span class="nav-icon">♧</span>Notifications</a>
+          <a class="nav-link" href="{{ url_for('logout') }}"><span class="nav-icon">↗</span>Sign out</a>
+          <div class="upgrade-card">
+            <span class="upgrade-icon">✦</span><strong>Level up your search</strong>
+            <span>Keep your profile updated to get stronger matches.</span>
+            <a href="{{ url_for('profile') if current_user.role != 'admin' else url_for('dashboard') }}">Improve profile <b>→</b></a>
+          </div>
+        </div>
+      </aside>
+
+      <div class="workspace">
+        <header class="topbar">
+          <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-controls="sidebar">☰</button>
+          <form method="GET" action="{{ url_for('search_results') }}" class="search-form">
+            <span class="search-icon">⌕</span><input type="text" name="q" placeholder="Search jobs, companies, skills..." value="{{ request.args.get('q', '') }}" />
+            <button type="submit" aria-label="Search">Search <kbd>⌘ K</kbd></button>
+          </form>
+          <div class="topbar-actions">
+            <a href="{{ url_for('notifications_page') }}" class="round-action" aria-label="Notifications">♧</a>
+            <a href="{{ url_for('profile') if current_user.role != 'admin' else url_for('dashboard') }}" class="user-menu"><span class="avatar">{{ current_user.full_name[:1]|upper }}</span><span class="user-menu-text"><b>{{ current_user.full_name }}</b><small>{{ current_user.role|replace('_', ' ')|title }}</small></span><span class="chevron">⌄</span></a>
+          </div>
+        </header>
+        {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-container">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% else %}
+      <header class="guest-topbar">
+        <a class="brand-wrap" href="{{ url_for('index') }}"><span class="brand-mark">JC</span><span><span class="brand-name">JobConnect</span><span class="brand-tag">Your Next Opportunity</span></span></a>
+        <nav class="guest-actions"><a href="{{ url_for('jobs') }}">Explore jobs</a><a class="btn btn-ghost btn-sm" href="{{ url_for('login') }}">Login</a><a class="btn btn-primary btn-sm" href="{{ url_for('register') }}">Create Account <span>→</span></a></nav>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-container guest-flash">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
+      {% endif %}
+      <main class="{% if current_user %}main-content{% else %}landing-main{% endif %}">{% block content %}{% endblock %}</main>
+      {% if current_user %}</div>{% endif %}
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block title %}My Profile | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Professional Profile</h2>
+  </div>
+
+  <div class="dashboard-panel">
+    <h3>Profile Completion</h3>
+    <div class="progress-track">
+      <div class="progress-bar" style="width: {{ profile_completion }}%;"></div>
+    </div>
+    <p><strong>{{ profile_completion }}% Complete</strong></p>
+  </div>
+
+  <div class="cards-grid" style="margin-top: 24px;">
+    <div class="form-panel">
+      <h3>Basic Information</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="update_basic" />
+        <div class="form-grid">
+          <div class="form-row"><label>Full name<input type="text" name="full_name" value="{{ user.full_name }}" /></label></div>
+          <div class="form-row"><label>Email<input type="email" name="email" value="{{ user.email }}" /></label></div>
+          <div class="form-row"><label>Phone<input type="text" name="phone" value="{{ user.phone }}" /></label></div>
+          <div class="form-row"><label>Location<input type="text" name="location" value="{{ user.location }}" /></label></div>
+          <div class="form-row" style="grid-column: 1 / -1;"><label>Headline<input type="text" name="headline" value="{{ profile_data.headline if profile_data else '' }}" /></label></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 12px;">Save Basic Info</button>
+      </form>
+    </div>
+
+    <div class="form-panel">
+      <h3>About</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="update_about" />
+        <textarea name="about" placeholder="Write a professional summary...">{{ profile_data.about if profile_data else '' }}</textarea>
+        <button type="submit" class="btn btn-primary" style="margin-top: 12px;">Save About</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="margin-top: 24px;">
+    <div class="form-panel">
+      <h3>Skills</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_skill" />
+        <div class="form-grid">
+          <div class="form-row"><label>Skill<input type="text" name="skill_name" placeholder="e.g. Python" /></label></div>
+          <div class="form-row"><label>Proficiency<select name="proficiency"><option>Beginner</option><option>Intermediate</option><option>Advanced</option></select></label></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-top: 12px;">Add Skill</button>
+      </form>
+      <div class="skills-inline" style="margin-top: 18px;">
+        {% for item in skills %}
+          <span class="skill-tag">{{ item.name }} · {{ item.proficiency }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="form-panel">
+      <h3>Education</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_education" />
+        <div class="form-row"><label>Institution<input type="text" name="institution" /></label></div>
+        <div class="form-row"><label>Degree<input type="text" name="degree" /></label></div>
+        <div class="form-row"><label>Field of Study<input type="text" name="field" /></label></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Start Year<input type="number" name="start_year" /></label></div>
+          <div class="form-row"><label>End Year<input type="number" name="end_year" /></label></div>
+        </div>
+        <div class="form-row"><label>Grade<input type="text" name="grade" /></label></div>
+        <button type="submit" class="btn btn-primary">Add Education</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="cards-grid" style="margin-top: 24px;">
+    <div class="form-panel">
+      <h3>Experience</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_experience" />
+        <div class="form-row"><label>Company<input type="text" name="company" /></label></div>
+        <div class="form-row"><label>Job Title<input type="text" name="job_title" /></label></div>
+        <div class="form-grid">
+          <div class="form-row"><label>Start Date<input type="date" name="start_date" /></label></div>
+          <div class="form-row"><label>End Date<input type="date" name="end_date" /></label></div>
+        </div>
+        <div class="form-row"><label>Description<textarea name="description"></textarea></label></div>
+        <button type="submit" class="btn btn-primary">Add Experience</button>
+      </form>
+    </div>
+
+    <div class="form-panel">
+      <h3>Projects</h3>
+      <form method="POST">
+        <input type="hidden" name="action" value="add_project" />
+        <div class="form-row"><label>Project Name<input type="text" name="project_name" /></label></div>
+        <div class="form-row"><label>Description<textarea name="description"></textarea></label></div>
+        <div class="form-row"><label>Technologies<input type="text" name="technologies" /></label></div>
+        <div class="form-grid">
+          <div class="form-row"><label>GitHub URL<input type="url" name="github_url" /></label></div>
+          <div class="form-row"><label>Demo URL<input type="url" name="demo_url" /></label></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Project</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="form-panel" style="margin-top: 24px;">
+    <h3>Certifications</h3>
+    <form method="POST">
+      <input type="hidden" name="action" value="add_certification" />
+      <div class="form-grid">
+        <div class="form-row"><label>Certificate Name<input type="text" name="certificate_name" /></label></div>
+        <div class="form-row"><label>Organization<input type="text" name="organization" /></label></div>
+        <div class="form-row"><label>Issue Date<input type="date" name="issue_date" /></label></div>
+        <div class="form-row"><label>Credential ID<input type="text" name="credential_id" /></label></div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top: 12px;">Add Certification</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+
+

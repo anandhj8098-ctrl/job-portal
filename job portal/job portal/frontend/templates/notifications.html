@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Notifications | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 900px;">
+  <div class="section-heading">
+    <h2>Notifications</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Message</th>
+          <th>Time</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for note in notifications %}
+        <tr>
+          <td>{{ note.title }}</td>
+          <td>{{ note.message }}</td>
+          <td>{{ note.created_at[:19] }}</td>
+          <td>{% if note.is_read %}<span class="badge success">Read</span>{% else %}<span class="badge warning">Unread</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4">No notifications available.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+

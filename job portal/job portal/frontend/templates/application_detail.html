@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Application Detail | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 960px;">
+  <div class="form-panel">
+    <div class="section-heading" style="margin-top: 0;">
+      <h2>Application Details</h2>
+      <span class="badge success">{{ application.status }}</span>
+    </div>
+
+    <div class="form-grid">
+      <div><strong>Application ID</strong><br />JOB-{{ application.id }}</div>
+      <div><strong>Job title</strong><br />{{ application.job_title }}</div>
+      <div><strong>Company</strong><br />{{ application.company_name }}</div>
+      <div><strong>Date applied</strong><br />{{ application.applied_at[:10] }}</div>
+      <div><strong>Resume used</strong><br />{{ application.resume_name or 'Default Resume' }}</div>
+      <div><strong>Recruiter</strong><br />{{ application.recruiter_name or 'Hiring Team' }}</div>
+    </div>
+
+    <div style="margin-top: 22px;">
+      <h3>Application Timeline</h3>
+      <div class="application-timeline">
+        {% for step in timeline %}
+          <span class="timeline-step {% if loop.index < 3 %}done{% elif application.status == 'interview' and loop.index == 4 %}active{% elif application.status == 'shortlisted' and loop.index == 3 %}active{% elif application.status == 'applied' and loop.index == 1 %}active{% else %}{% endif %}">{{ step }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <h3>Cover letter</h3>
+      <p>{{ application.cover_letter or 'N/A' }}</p>
+      <h3>Additional information</h3>
+      <p>{{ application.additional_info or 'N/A' }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+

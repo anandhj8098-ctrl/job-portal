@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Interview Details | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 900px;">
+  <div class="form-panel">
+    <h2>Interview Details</h2>
+    <div class="form-grid">
+      <div><strong>Company</strong><br />{{ interview.company_name }}</div>
+      <div><strong>Job</strong><br />{{ interview.job_title }}</div>
+      <div><strong>Interview Type</strong><br />{{ interview.interview_type }}</div>
+      <div><strong>Date</strong><br />{{ interview.interview_date }}</div>
+      <div><strong>Time</strong><br />{{ interview.interview_time }}</div>
+      <div><strong>Duration</strong><br />{{ interview.duration }}</div>
+      <div><strong>Interviewer</strong><br />{{ interview.interviewer }}</div>
+      <div><strong>Status</strong><br />{{ interview.status }}</div>
+    </div>
+    <div style="margin-top: 20px;">
+      <h3>Meeting link</h3>
+      <p><a href="{{ interview.meeting_link }}" target="_blank">Join Interview</a></p>
+      <h3>Instructions</h3>
+      <p>{{ interview.instructions }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+

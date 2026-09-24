@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}Find Jobs | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>IT Job Search</h2>
+  </div>
+
+  <div class="form-panel">
+    <form method="GET" action="{{ url_for('jobs') }}">
+      <div class="filters">
+        <div class="field">
+          <label>Search by title or keyword
+            <input type="text" name="q" value="{{ q or '' }}" placeholder="Python Developer, SQL, React" />
+          </label>
+        </div>
+        <div class="field">
+          <label>Location
+            <select name="location">
+              <option value="">Any</option>
+              {% for loc in ['Coimbatore','Chennai','Bangalore','Hyderabad','Mumbai','Pune','Delhi','Remote'] %}
+              <option value="{{ loc }}" {% if filters.location == loc %}selected{% endif %}>{{ loc }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="field">
+          <label>Employment Type
+            <select name="employment_type">
+              <option value="">Any</option>
+              {% for value in ['Full Time','Part Time','Internship','Contract'] %}
+              <option value="{{ value }}" {% if filters.employment_type == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="field">
+          <label>Experience
+            <select name="experience_level">
+              <option value="">Any</option>
+              {% for value in ['Fresher','Entry Level','1–2 Years','2–5 Years','5+ Years'] %}
+              <option value="{{ value }}" {% if filters.experience_level == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="field">
+          <label>Workplace
+            <select name="workplace_type">
+              <option value="">Any</option>
+              {% for value in ['On-site','Hybrid','Remote'] %}
+              <option value="{{ value }}" {% if filters.workplace_type == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+        <div class="field">
+          <label>Min Salary
+            <input type="number" name="min_salary" value="{{ filters.min_salary or '' }}" />
+          </label>
+        </div>
+        <div class="field">
+          <label>Max Salary
+            <input type="number" name="max_salary" value="{{ filters.max_salary or '' }}" />
+          </label>
+        </div>
+        <div class="field">
+          <label>Date Posted
+            <select name="date_range">
+              <option value="">Any</option>
+              <option value="today" {% if filters.date_range == 'today' %}selected{% endif %}>Today</option>
+              <option value="3days" {% if filters.date_range == '3days' %}selected{% endif %}>Last 3 days</option>
+              <option value="7days" {% if filters.date_range == '7days' %}selected{% endif %}>Last 7 days</option>
+              <option value="30days" {% if filters.date_range == '30days' %}selected{% endif %}>Last 30 days</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+    </form>
+  </div>
+
+  <div class="cards-grid" style="margin-top: 22px;">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="topline">
+        <div class="tag">{{ job.company_name }}</div>
+        <span class="badge success">{{ job.applicant_count or 0 }} applicants</span>
+      </div>
+      <div class="company-row" style="margin-top: 12px;">
+        <div class="company-badge">{{ job.company_name[:2]|upper }}</div>
+        <div>
+          <div><strong>{{ job.title }}</strong></div>
+          <div style="color: var(--muted);">{{ job.company_name }}</div>
+        </div>
+      </div>
+      <div class="job-meta">
+        <span class="meta-pill">{{ job.location }}</span>
+        <span class="meta-pill">{{ job.workplace_type }}</span>
+        <span class="meta-pill">{{ job.employment_type }}</span>
+        <span class="meta-pill">{{ job.experience_level }}</span>
+      </div>
+      <div class="job-meta">
+        <span class="meta-pill">₹{{ job.salary_min }}-₹{{ job.salary_max }} LPA</span>
+        <span class="meta-pill">Posted {{ job.created_at[:10] }}</span>
+      </div>
+      <div class="skills-inline">
+        {% for skill in (job.required_skills or '').split(',')[:4] %}
+          <span class="skill-tag">{{ skill.strip() }}</span>
+        {% endfor %}
+      </div>
+      <div class="card-actions">
+        <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn btn-secondary btn-sm">View Job</a>
+        <form method="POST" action="{{ url_for('save_job', job_id=job.id) }}" style="display: inline;">
+          <button type="submit" class="btn btn-secondary btn-sm">{% if job.is_saved %}Saved{% else %}Save Job{% endif %}</button>
+        </form>
+        <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-primary btn-sm">Apply Now</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="info-card">No jobs match the applied filters. Try another search.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+
+

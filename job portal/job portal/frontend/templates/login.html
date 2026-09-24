@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Login | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 520px; margin-top: 60px;">
+  <div class="form-panel">
+    <h2 style="margin-top: 0;">Welcome back</h2>
+    <p style="color: var(--muted);">Login to continue your IT job search.</p>
+    <form method="POST">
+      <div class="form-row">
+        <label>Username or Email
+          <input type="text" name="identifier" placeholder="e.g. josewa or josewa@example.com" required />
+        </label>
+      </div>
+      <div class="form-row">
+        <label>Password
+          <input type="password" name="password" placeholder="Enter your password" required />
+        </label>
+      </div>
+      <button class="btn btn-primary" type="submit" style="width: 100%;">Login</button>
+    </form>
+    <p style="margin-top: 18px; text-align: center; color: var(--muted);">
+      New here? <a href="{{ url_for('register') }}" style="color: var(--primary); font-weight: 700;">Create an account</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+
+

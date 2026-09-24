@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Search Results | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Search Results for "{{ query }}"</h2>
+  </div>
+  <div class="cards-grid">
+    {% for job in jobs %}
+    <div class="job-card">
+      <div class="company-row">
+        <div class="company-badge">{{ job.company_name[:2]|upper }}</div>
+        <div>
+          <div><strong>{{ job.title }}</strong></div>
+          <div style="color: var(--muted);">{{ job.company_name }}</div>
+        </div>
+      </div>
+      <div class="job-meta">
+        <span class="meta-pill">{{ job.location }}</span>
+        <span class="meta-pill">{{ job.workplace_type }}</span>
+      </div>
+      <div class="card-actions">
+        <a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn btn-secondary btn-sm">View Job</a>
+        <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-primary btn-sm">Apply Now</a>
+      </div>
+    </div>
+    {% else %}
+    <div class="info-card">No matching jobs found in the platform.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+
+

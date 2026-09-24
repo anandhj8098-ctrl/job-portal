@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Admin Dashboard</h2>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Total Users</div><div class="value">{{ stats.total_users }}</div></div>
+    <div class="stat-card"><div class="label">Job Seekers</div><div class="value">{{ stats.job_seekers }}</div></div>
+    <div class="stat-card"><div class="label">Recruiters</div><div class="value">{{ stats.recruiters }}</div></div>
+    <div class="stat-card"><div class="label">Companies</div><div class="value">{{ stats.companies }}</div></div>
+    <div class="stat-card"><div class="label">Jobs</div><div class="value">{{ stats.jobs }}</div></div>
+    <div class="stat-card"><div class="label">Applications</div><div class="value">{{ stats.applications }}</div></div>
+    <div class="stat-card"><div class="label">Interviews</div><div class="value">{{ stats.interviews }}</div></div>
+    <div class="stat-card"><div class="label">Selected</div><div class="value">{{ stats.selected }}</div></div>
+  </div>
+
+  <div class="chart-grid">
+    <div class="chart-card">
+      <h3>Jobs by Category</h3>
+      <div class="bar-holder">
+        <div class="bar-row"><span>Python</span><div class="bar" style="width: 84%;"></div><span>84%</span></div>
+        <div class="bar-row"><span>Web</span><div class="bar" style="width: 72%;"></div><span>72%</span></div>
+        <div class="bar-row"><span>Data</span><div class="bar" style="width: 68%;"></div><span>68%</span></div>
+        <div class="bar-row"><span>Cloud</span><div class="bar" style="width: 60%;"></div><span>60%</span></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Applications per month</h3>
+      <div class="bar-holder">
+        <div class="bar-row"><span>Jan</span><div class="bar" style="width: 42%;"></div><span>42</span></div>
+        <div class="bar-row"><span>Feb</span><div class="bar" style="width: 58%;"></div><span>58</span></div>
+        <div class="bar-row"><span>Mar</span><div class="bar" style="width: 70%;"></div><span>70</span></div>
+        <div class="bar-row"><span>Apr</span><div class="bar" style="width: 78%;"></div><span>78</span></div>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>Most popular skills</h3>
+      <div class="bar-holder">
+        <div class="bar-row"><span>Python</span><div class="bar" style="width: 92%;"></div><span>92%</span></div>
+        <div class="bar-row"><span>SQL</span><div class="bar" style="width: 86%;"></div><span>86%</span></div>
+        <div class="bar-row"><span>React</span><div class="bar" style="width: 80%;"></div><span>80%</span></div>
+        <div class="bar-row"><span>Java</span><div class="bar" style="width: 70%;"></div><span>70%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+

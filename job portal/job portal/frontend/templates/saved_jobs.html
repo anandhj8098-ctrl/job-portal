@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Saved Jobs | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Saved Jobs</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Job Title</th>
+          <th>Company</th>
+          <th>Location</th>
+          <th>Salary</th>
+          <th>Date Saved</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.title }}</td>
+          <td>{{ job.company_name }}</td>
+          <td>{{ job.location }}</td>
+          <td>₹{{ job.salary_min }}-₹{{ job.salary_max }} LPA</td>
+          <td>{{ job.saved_at[:10] }}</td>
+          <td>
+            <a href="{{ url_for('job_detail', job_id=job.job_id) }}" class="btn btn-secondary btn-sm">View</a>
+            <a href="{{ url_for('apply_job', job_id=job.job_id) }}" class="btn btn-primary btn-sm">Apply</a>
+            <form method="POST" action="{{ url_for('remove_saved_job', saved_job_id=job.saved_job_id) }}" style="display:inline;">
+              <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">No saved jobs yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+

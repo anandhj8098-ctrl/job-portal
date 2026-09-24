@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Apply for {{ job.title }} | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 820px;">
+  <div class="form-panel">
+    <h2>Application for {{ job.title }}</h2>
+    <p style="color: var(--muted);">{{ job.company_name }} • {{ job.location }}</p>
+    <form method="POST" enctype="multipart/form-data">
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Full Name<input type="text" name="full_name" value="{{ user.full_name }}" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Email<input type="email" name="email" value="{{ user.email }}" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Phone<input type="text" name="phone" value="{{ user.phone }}" required /></label>
+        </div>
+        <div class="form-row">
+          <label>Location<input type="text" name="location" value="{{ user.location }}" required /></label>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label>Resume upload (PDF, DOC, DOCX)
+          <input type="file" name="resume" accept=".pdf,.doc,.docx" />
+        </label>
+      </div>
+
+      <div class="form-row">
+        <label>Cover Letter
+          <textarea name="cover_letter" placeholder="Tell us why you are a good fit for this position."></textarea>
+        </label>
+      </div>
+      <div class="form-grid">
+        <div class="form-row">
+          <label>Portfolio URL<input type="url" name="portfolio_url" /></label>
+        </div>
+        <div class="form-row">
+          <label>GitHub URL<input type="url" name="github_url" /></label>
+        </div>
+        <div class="form-row">
+          <label>LinkedIn URL<input type="url" name="linkedin_url" /></label>
+        </div>
+      </div>
+      <div class="form-row">
+        <label>Additional Information
+          <textarea name="additional_info"></textarea>
+        </label>
+      </div>
+      <button class="btn btn-primary" type="submit">Submit Application</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+
+

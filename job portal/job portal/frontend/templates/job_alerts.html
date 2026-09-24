@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Job Alerts | JobConnect{% endblock %}
+{% block content %}
+<div class="container" style="max-width: 900px;">
+  <div class="section-heading">
+    <h2>Job Alerts</h2>
+  </div>
+
+  <div class="form-panel">
+    <form method="POST">
+      <div class="form-grid">
+        <div class="form-row"><label>Job title<input type="text" name="keywords" placeholder="Python Developer" /></label></div>
+        <div class="form-row"><label>Location<input type="text" name="location" placeholder="Bangalore" /></label></div>
+        <div class="form-row"><label>Employment Type<select name="employment_type"><option>Full Time</option><option>Internship</option><option>Contract</option></select></label></div>
+        <div class="form-row"><label>Experience Level<select name="experience_level"><option>Fresher</option><option>Entry Level</option><option>1–2 Years</option></select></label></div>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top: 16px;">Create Alert</button>
+    </form>
+  </div>
+
+  <div class="table-wrap" style="margin-top: 24px;">
+    <table>
+      <thead>
+        <tr>
+          <th>Alert</th>
+          <th>Location</th>
+          <th>Type</th>
+          <th>Experience</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for alert in alerts %}
+        <tr>
+          <td>{{ alert.keywords }}</td>
+          <td>{{ alert.location }}</td>
+          <td>{{ alert.employment_type }}</td>
+          <td>{{ alert.experience_level }}</td>
+          <td>{% if alert.active %}<span class="badge success">Active</span>{% else %}<span class="badge danger">Paused</span>{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No job alerts created yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}My Jobs | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>My Job Postings</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Job Title</th>
+          <th>Location</th>
+          <th>Salary</th>
+          <th>Applicants</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.title }}</td>
+          <td>{{ job.location }}</td>
+          <td>₹{{ job.salary_min }}-₹{{ job.salary_max }} LPA</td>
+          <td>{{ job.applicant_count or 0 }}</td>
+          <td><span class="badge success">{{ job.status }}</span></td>
+          <td><a href="{{ url_for('recruiter_applicants') }}" class="btn btn-secondary btn-sm">View Applicants</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">No jobs posted yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+

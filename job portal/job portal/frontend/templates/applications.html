@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Applications | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>My Applications</h2>
+    <div class="card-actions">
+      <a href="{{ url_for('applications_page', view='list') }}" class="btn btn-secondary btn-sm">List View</a>
+      <a href="{{ url_for('applications_page', view='kanban') }}" class="btn btn-secondary btn-sm">Kanban View</a>
+    </div>
+  </div>
+
+  {% if view == 'kanban' %}
+    <div class="stats-grid" style="grid-template-columns: repeat(4, minmax(180px, 1fr));">
+      {% for status in ['applied','under_review','shortlisted','interview','selected','rejected'] %}
+      <div class="dashboard-panel">
+        <h3>{{ status|replace('_',' ')|title }}</h3>
+        {% set filtered = applications|selectattr('status','equalto',status)|list %}
+        {% for app in filtered %}
+          <div class="info-card" style="margin-top: 12px;">
+            <strong>{{ app.job_title }}</strong><br>
+            {{ app.company_name }}<br>
+            <span class="badge">{{ app.status }}</span>
+          </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Application ID</th>
+            <th>Job</th>
+            <th>Company</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for app in applications %}
+          <tr>
+            <td>JOB-{{ app.id }}</td>
+            <td>{{ app.job_title }}</td>
+            <td>{{ app.company_name }}</td>
+            <td>{{ app.applied_at[:10] }}</td>
+            <td><span class="badge {% if app.status == 'selected' %}success{% elif app.status == 'rejected' %}danger{% elif app.status == 'shortlisted' or app.status == 'interview' %}warning{% endif %}">{{ app.status }}</span></td>
+            <td><a href="{{ url_for('application_detail', application_id=app.id) }}">View Details</a></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+

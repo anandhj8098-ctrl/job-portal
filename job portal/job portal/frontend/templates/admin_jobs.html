@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Admin Jobs | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Jobs Management</h2>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Company</th>
+          <th>Location</th>
+          <th>Employment</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.title }}</td>
+          <td>{{ job.company_name or 'Demo Company' }}</td>
+          <td>{{ job.location }}</td>
+          <td>{{ job.employment_type }}</td>
+          <td><span class="badge success">{{ job.status }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No jobs found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+

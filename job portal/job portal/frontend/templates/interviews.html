@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Interviews | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Interview Schedule</h2>
+  </div>
+  <div class="cards-grid">
+    {% for interview in interviews %}
+    <div class="interview-card" style="padding: 20px;">
+      <div class="tag">{{ interview.job_title }}</div>
+      <h3>{{ interview.company_name }}</h3>
+      <p><strong>Date:</strong> {{ interview.interview_date }}</p>
+      <p><strong>Time:</strong> {{ interview.interview_time }}</p>
+      <p><strong>Type:</strong> {{ interview.interview_type }}</p>
+      <p><strong>Status:</strong> {{ interview.status }}</p>
+      <a href="{{ url_for('interview_detail', interview_id=interview.id) }}" class="btn btn-primary btn-sm">View Interview Details</a>
+    </div>
+    {% else %}
+    <div class="info-card">No interviews scheduled yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+
+

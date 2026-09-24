@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Applicants | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Applicant Management</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Candidate</th>
+          <th>Job</th>
+          <th>Resume</th>
+          <th>Date Applied</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for applicant in applicants %}
+        <tr>
+          <td>{{ applicant.full_name }}<br>{{ applicant.email }}</td>
+          <td>{{ applicant.job_title }}</td>
+          <td>{{ applicant.resume_name or 'Uploaded' }}</td>
+          <td>{{ applicant.applied_at[:10] }}</td>
+          <td><span class="badge">{{ applicant.status }}</span></td>
+          <td>
+            <form method="POST" action="{{ url_for('update_application_status', application_id=applicant.id) }}" style="display:inline;">
+              <select name="status" style="width: 130px; display:inline-block; margin-right: 8px;">
+                <option>applied</option>
+                <option>under_review</option>
+                <option>shortlisted</option>
+                <option>interview</option>
+                <option>selected</option>
+                <option>rejected</option>
+              </select>
+              <button type="submit" class="btn btn-secondary btn-sm">Update</button>
+            </form>
+            <form method="POST" action="{{ url_for('schedule_interview') }}" style="display:inline; margin-top:8px;">
+              <input type="hidden" name="application_id" value="{{ applicant.id }}" />
+              <input type="hidden" name="interview_type" value="Technical Interview" />
+              <input type="hidden" name="interview_date" value="2026-09-15" />
+              <input type="hidden" name="interview_time" value="10:30" />
+              <input type="hidden" name="duration" value="60 minutes" />
+              <input type="hidden" name="interviewer" value="Recruiting Team" />
+              <input type="hidden" name="meeting_link" value="https://meet.demo/jobconnect/demo" />
+              <input type="hidden" name="instructions" value="Please join with your camera on." />
+              <button type="submit" class="btn btn-primary btn-sm">Schedule Interview</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6">No applicants yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+
+

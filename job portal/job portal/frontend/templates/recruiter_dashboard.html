@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Recruiter Dashboard | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="section-heading">
+    <h2>Recruiter Dashboard</h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="label">Active Jobs</div><div class="value">{{ active_jobs }}</div></div>
+    <div class="stat-card"><div class="label">Applicants</div><div class="value">{{ applicants }}</div></div>
+    <div class="stat-card"><div class="label">Shortlisted</div><div class="value">{{ shortlisted }}</div></div>
+    <div class="stat-card"><div class="label">Interviews</div><div class="value">{{ interviews }}</div></div>
+    <div class="stat-card"><div class="label">Selected</div><div class="value">{{ selected }}</div></div>
+  </div>
+
+  <div class="form-panel" style="margin-top: 24px;">
+    <h3>Create new job</h3>
+    <form method="POST" action="{{ url_for('create_job') }}">
+      <div class="form-grid">
+        <div class="form-row"><label>Job title<input type="text" name="title" /></label></div>
+        <div class="form-row"><label>Location<input type="text" name="location" /></label></div>
+        <div class="form-row"><label>Company name<input type="text" name="company_name" /></label></div>
+        <div class="form-row"><label>Employment type<select name="employment_type"><option>Full Time</option><option>Part Time</option><option>Internship</option><option>Contract</option></select></label></div>
+        <div class="form-row"><label>Workplace type<select name="workplace_type"><option>On-site</option><option>Hybrid</option><option>Remote</option></select></label></div>
+        <div class="form-row"><label>Experience<select name="experience_level"><option>Fresher</option><option>Entry Level</option><option>1–2 Years</option><option>2–5 Years</option><option>5+ Years</option></select></label></div>
+        <div class="form-row"><label>Salary min<input type="number" name="salary_min" /></label></div>
+        <div class="form-row"><label>Salary max<input type="number" name="salary_max" /></label></div>
+        <div class="form-row"><label>Deadline<input type="date" name="deadline" /></label></div>
+      </div>
+      <div class="form-row"><label>Description<textarea name="description"></textarea></label></div>
+      <div class="form-row"><label>Responsibilities<textarea name="responsibilities"></textarea></label></div>
+      <div class="form-grid">
+        <div class="form-row"><label>Required skills<input type="text" name="required_skills" /></label></div>
+        <div class="form-row"><label>Preferred skills<input type="text" name="preferred_skills" /></label></div>
+        <div class="form-row"><label>Education<input type="text" name="education" /></label></div>
+      </div>
+      <button type="submit" class="btn btn-primary">Post Job</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+
+

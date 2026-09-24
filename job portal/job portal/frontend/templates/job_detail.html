@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block title %}{{ job.title }} | JobConnect{% endblock %}
+{% block content %}
+<div class="container">
+  <div class="form-panel">
+    <div class="company-row">
+      <div class="company-badge">{{ job.company_name[:2]|upper }}</div>
+      <div>
+        <div><strong>{{ job.title }}</strong></div>
+        <div style="color: var(--muted);">{{ job.company_name }} • {{ job.location }}</div>
+      </div>
+    </div>
+
+    <div class="job-meta">
+      <span class="meta-pill">{{ job.employment_type }}</span>
+      <span class="meta-pill">{{ job.workplace_type }}</span>
+      <span class="meta-pill">{{ job.experience_level }}</span>
+      <span class="meta-pill">₹{{ job.salary_min }}-₹{{ job.salary_max }} LPA</span>
+    </div>
+
+    <div class="card-actions" style="margin: 18px 0;">
+      <a href="{{ url_for('apply_job', job_id=job.id) }}" class="btn btn-primary">Apply Now</a>
+      <form method="POST" action="{{ url_for('save_job', job_id=job.id) }}" style="display: inline;">
+        <button type="submit" class="btn btn-secondary">{% if job.is_saved %}Saved{% else %}Save Job{% endif %}</button>
+      </form>
+      <button class="btn btn-secondary" type="button">Share Job</button>
+    </div>
+
+    <div class="form-grid" style="margin-top: 18px;">
+      <div>
+        <strong>Company</strong><br />{{ job.company_name }}
+      </div>
+      <div>
+        <strong>Location</strong><br />{{ job.location }}
+      </div>
+      <div>
+        <strong>Employment Type</strong><br />{{ job.employment_type }}
+      </div>
+      <div>
+        <strong>Workplace</strong><br />{{ job.workplace_type }}
+      </div>
+      <div>
+        <strong>Experience</strong><br />{{ job.experience_level }}
+      </div>
+      <div>
+        <strong>Applicants</strong><br />{{ job.applicant_count or 0 }}
+      </div>
+    </div>
+
+    <div style="margin-top: 24px;">
+      <h3>Job description</h3>
+      <p>{{ job.description }}</p>
+      <h3>Responsibilities</h3>
+      <p>{{ job.responsibilities }}</p>
+      <h3>Required skills</h3>
+      <div class="skills-inline">
+        {% for skill in (job.required_skills or '').split(',') %}
+        <span class="skill-tag">{{ skill.strip() }}</span>
+        {% endfor %}
+      </div>
+      <h3>Preferred skills</h3>
+      <div class="skills-inline">
+        {% for skill in (job.preferred_skills or '').split(',') %}
+        <span class="skill-tag">{{ skill.strip() }}</span>
+        {% endfor %}
+      </div>
+      <h3>Education requirements</h3>
+      <p>{{ job.education }}</p>
+      <h3>Application deadline</h3>
+      <p>{{ job.deadline }}</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard | JobConnect{% endblock %}
+{% block content %}
+<div class="dashboard-layout">
+  <div class="dashboard-grid">
+    <div class="dashboard-main">
+      <section class="welcome-card">
+        <span class="morning-pill">Good morning, {{ user.full_name.split(' ')[0] }} 👋</span>
+        <h1>Your next big <span class="gradient-text">opportunity</span> is here.</h1>
+        <p>Explore opportunities tailored to your skills, build your profile, and take the next step in your career.</p>
+        <form class="dashboard-search" method="GET" action="{{ url_for('search_results') }}">
+          <span class="search-icon">⌕</span><input name="q" placeholder="Search jobs, companies, skills..." /><button type="submit">→</button>
+        </form>
+        <div class="popular-searches"><b>Popular:</b><a href="{{ url_for('jobs', q='React') }}">React</a><a href="{{ url_for('jobs', q='JavaScript') }}">JavaScript</a><a href="{{ url_for('jobs', q='Python') }}">Python</a><a href="{{ url_for('jobs', q='AWS') }}">AWS</a><a href="{{ url_for('jobs', q='UI UX') }}">UI/UX</a></div>
+        <div class="tech-scene" aria-hidden="true">
+          <span class="floating-tech tech-react">◌ React</span><span class="floating-tech tech-node">⬡ Node.js</span><span class="floating-tech tech-aws">☁ AWS</span><span class="floating-tech future-tag">Build<br />your future ↗</span>
+          <div class="tech-screen"><span class="code-line"></span><span class="code-line short"></span><span class="code-line"></span><span class="code-line tiny"></span><span class="code-line short"></span></div><div class="tech-keyboard"></div>
+        </div>
+      </section>
+
+      <section class="recommendations">
+        <div class="section-title"><div><h2><span>🔥</span>Recommended Jobs</h2><p>Handpicked opportunities just for you</p></div><a href="{{ url_for('jobs') }}">View all →</a></div>
+        <div class="cards-grid recommended-grid">
+          {% for item in recommended_jobs %}
+          {% set job = item.job %}
+          <article class="job-card">
+            <div class="topline"><span class="badge">{{ item.match }}% match</span><button class="bookmark" type="button" aria-label="Save {{ job.title }}">♧</button></div>
+            <div class="company-row"><div class="company-badge">{{ job.company_name[:1]|upper }}</div><div><strong>{{ job.title }}</strong><div style="color: var(--muted); font-size: 10px; margin-top: 3px;">{{ job.company_name }}</div></div></div>
+            <div class="job-meta"><span class="meta-pill">⌖ {{ job.location }}</span><span class="meta-pill">{{ job.workplace_type }}</span></div>
+            <div class="job-meta"><span class="meta-pill">₹{{ job.salary_min }}–{{ job.salary_max }} LPA</span></div>
+            <div class="skills-inline">{% for skill in (job.required_skills or '').split(',')[:3] %}<span class="skill-tag">{{ skill.strip() }}</span>{% endfor %}</div>
+            <div class="card-actions"><span class="tag">◷ New role</span><a href="{{ url_for('job_detail', job_id=job.id) }}" class="btn btn-secondary btn-sm">View job</a></div>
+          </article>
+          {% else %}
+          <div class="info-card">Add skills to your profile to receive personalised job recommendations.</div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="dashboard-lower">
+        <div class="dashboard-panel category-panel">
+          <div class="section-title"><h2>Popular IT Job Categories</h2><a href="{{ url_for('jobs') }}">View all →</a></div>
+          <div class="category-grid">
+            <a class="category-item" href="{{ url_for('jobs', q='Software Developer') }}"><i class="category-icon">⌘</i><b>Software Developer</b><span>32+ jobs</span></a>
+            <a class="category-item" href="{{ url_for('jobs', q='Web Developer') }}"><i class="category-icon">◎</i><b>Web Developer</b><span>24+ jobs</span></a>
+            <a class="category-item" href="{{ url_for('jobs', q='Python') }}"><i class="category-icon">⌁</i><b>Python Developer</b><span>18+ jobs</span></a>
+            <a class="category-item" href="{{ url_for('jobs', q='Data') }}"><i class="category-icon">▥</i><b>Data Analyst</b><span>15+ jobs</span></a>
+          </div>
+        </div>
+        <div class="dashboard-panel companies-panel">
+          <div class="section-title"><h2>Top Companies Hiring</h2><a href="{{ url_for('jobs') }}">View all →</a></div>
+          <div class="company-list">
+            <div class="company-list-item"><i>T</i><div><b>TechNova Solutions</b><span>Python Developer · Open roles</span></div></div>
+            <div class="company-list-item"><i>C</i><div><b>CodeSphere Technologies</b><span>Web Developer · Open roles</span></div></div>
+            <div class="company-list-item"><i>F</i><div><b>FutureSoft Systems</b><span>Software Engineer · Open roles</span></div></div>
+            <div class="company-list-item"><i>D</i><div><b>DataForge Labs</b><span>Data Analyst · Open roles</span></div></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="dashboard-side">
+      <div class="stat-grid-compact">
+        <div class="stat-card stat-visual"><span class="stat-icon">▣</span><div class="label">Recommended</div><div class="value">{{ recommended_jobs|length }}</div><span class="trend">for you</span></div>
+        <div class="stat-card stat-visual"><span class="stat-icon">♡</span><div class="label">Saved Jobs</div><div class="value">{{ saved_jobs_count }}</div><span class="trend">ready</span></div>
+        <div class="stat-card stat-visual"><span class="stat-icon">▤</span><div class="label">Applications</div><div class="value">{{ applications_count }}</div><span class="trend">tracked</span></div>
+        <div class="stat-card stat-visual"><span class="stat-icon">□</span><div class="label">Interviews</div><div class="value">{{ upcoming_interviews_count }}</div><span class="trend">upcoming</span></div>
+      </div>
+      <section class="dashboard-panel profile-snapshot">
+        <div class="profile-top"><span class="avatar">{{ user.full_name[:1]|upper }}</span><div><b>{{ user.full_name }}</b><small>Job Seeker · {{ user.location }}</small></div><a class="btn btn-secondary btn-sm" href="{{ url_for('profile') }}">Edit</a></div>
+        <div class="label"><span>Profile strength</span><span>{{ profile_completion }}%</span></div><div class="progress-track"><div class="progress-bar" style="width: {{ profile_completion }}%;"></div></div>
+        <div class="profile-details"><span>Profile<b>Updated</b></span><span>Saved<b>{{ saved_jobs_count }}</b></span><span>Applied<b>{{ applications_count }}</b></span><span>Alerts<b>{{ unread_notifications_count }}</b></span></div>
+      </section>
+      <section class="dashboard-panel activity-card">
+        <div class="activity-head"><h3>Recent Activity</h3><a href="{{ url_for('notifications_page') }}">View all →</a></div>
+        <div class="activity-list"><div class="activity-item"><i class="activity-dot">✓</i><div><b>Profile match refreshed</b><span>Your current skills were used to find roles.</span></div></div><div class="activity-item"><i class="activity-dot">▣</i><div><b>{{ applications_count }} applications tracked</b><span>Review their latest status from Applications.</span></div></div><div class="activity-item"><i class="activity-dot">✦</i><div><b>{{ unread_notifications_count }} new notifications</b><span>Stay up to date with your job search.</span></div></div></div>
+      </section>
+      <section class="dashboard-panel keep-going"><h3>Keep going, {{ user.full_name.split(' ')[0] }}!</h3><p>Your next opportunity is just a few steps away.</p><a class="btn btn-primary btn-sm" href="{{ url_for('jobs') }}">Explore jobs →</a></section>
+    </aside>
+  </div>
+</div>
+{% endblock %}
