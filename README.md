@@ -1,4 +1,4 @@
- JobConnect
+# JobConnect
 
 JobConnect is a Flask + SQLite demo platform for IT job search, profile management, recruiter workflows, and admin monitoring.
 
@@ -25,7 +25,7 @@ JobConnect is a Flask + SQLite demo platform for IT job search, profile manageme
 
 ## Install dependencies
 
-From the project root:
+From the repository root:
 
 ```bash
 python -m venv .venv
@@ -38,10 +38,10 @@ pip install -r requirements.txt
 
 The database is created automatically when the app starts. There is no manual migration step needed.
 
-## Start the backend server
+## Start locally
 
 ```bash
-python backend/app.py
+python "job portal/job portal/backend/app.py"
 ```
 
 The app will run at:
@@ -76,6 +76,22 @@ http://localhost:5000
 ```
 
 Use the login form or the demo credentials above.
+
+## Deploy
+
+This is a Flask server, so it cannot run on GitHub Pages. Use a Python host
+such as Render, Railway, or Fly.io connected to this GitHub repository.
+
+The repository includes a root `Procfile` and `requirements.txt` for hosts
+that auto-detect them. The production command is:
+
+```bash
+gunicorn --chdir "job portal/job portal" --bind 0.0.0.0:$PORT backend.app:app
+```
+
+Set `JOBCONNECT_SECRET_KEY` to a long random value in the host environment.
+The bundled SQLite database and uploaded resumes are suitable for a demo only;
+use persistent storage or a managed database for production.
 
 ## Notes
 
