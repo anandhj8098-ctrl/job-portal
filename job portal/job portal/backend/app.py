@@ -15,11 +15,20 @@ except ModuleNotFoundError:
     from database import DB_PATH, UPLOAD_DIR, get_db_connection, init_db
 
 app = Flask(__name__, template_folder="../frontend/templates", static_folder="../frontend/static")
-app.config["SECRET_KEY"] = "jobconnect-demo-secret-key"
+app.config["SECRET_KEY"] = os.environ.get("JOBCONNECT_SECRET_KEY") or os.urandom(32)
 app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
 app.config["UPLOAD_FOLDER"] = str(UPLOAD_DIR)
 
 ALLOWED_EXTENSIONS = {"pdf", "doc", "docx"}
+
+
+def resolve_resume_path(file_path):
+    path = Path(file_path)
+    if path.is_file():
+        return path
+    legacy_name = Path(str(file_path).replace("\\", "/")).name
+    fallback = UPLOAD_DIR / legacy_name
+    return fallback if fallback.is_file() else path
 
 
 def login_required(view):
@@ -232,7 +241,7 @@ def get_job_details(job_id):
                (SELECT COUNT(*) FROM applications a WHERE a.job_id = j.id) AS applicant_count
         FROM jobs j
         LEFT JOIN companies c ON c.id = j.company_id
-        WHERE j.id = ?
+        WHERE j.id = ? AND j.status = 'active'
         """,
         (job_id,),
     ).fetchone()
@@ -716,6 +725,11 @@ def job_detail(job_id):
 @login_required
 def save_job(job_id):
     conn = get_db_connection()
+    job = conn.execute("SELECT id FROM jobs WHERE id = ? AND status = 'active'", (job_id,)).fetchone()
+    if not job:
+        conn.close()
+        flash("Job not found.", "error")
+        return redirect(request.referrer or url_for("jobs"))
     existing = conn.execute("SELECT id FROM saved_jobs WHERE user_id = ? AND job_id = ?", (session["user_id"], job_id)).fetchone()
     if not existing:
         conn.execute("INSERT INTO saved_jobs (user_id, job_id) VALUES (?, ?)", (session["user_id"], job_id))
@@ -858,7 +872,7 @@ def application_detail(application_id):
     conn = get_db_connection()
     app_row = conn.execute(
         """
-        SELECT a.*, j.title AS job_title, j.location AS job_location, c.company_name, u.full_name AS recruiter_name,
+        SELECT a.*, j.title AS job_title, j.location AS job_location, j.recruiter_id, c.company_name, u.full_name AS recruiter_name,
                r.file_name AS resume_name
         FROM applications a
         JOIN jobs j ON j.id = a.job_id
@@ -871,7 +885,8 @@ def application_detail(application_id):
     ).fetchone()
     if not app_row:
         conn.close(); flash("Application not found.", "error"); return redirect(url_for("applications_page"))
-    if app_row["user_id"] != user["id"] and user["role"] not in ["admin", "recruiter"]:
+    recruiter_can_view = user["role"] == "recruiter" and app_row["recruiter_id"] == user["id"]
+    if app_row["user_id"] != user["id"] and user["role"] != "admin" and not recruiter_can_view:
         conn.close(); flash("Unauthorized access.", "error"); return redirect(url_for("dashboard"))
     timeline = [
         "Application Submitted",
@@ -927,13 +942,31 @@ def resume_management():
 def download_resume(resume_id):
     user = get_current_user()
     conn = get_db_connection()
-    resume = conn.execute("SELECT * FROM resumes WHERE id = ?", (resume_id,)).fetchone()
+    resume = conn.execute(
+        """
+        SELECT r.*,
+               EXISTS(
+                   SELECT 1
+                   FROM applications a
+                   JOIN jobs j ON j.id = a.job_id
+                   WHERE a.resume_id = ? AND j.recruiter_id = ?
+               ) AS recruiter_access
+        FROM resumes r
+        WHERE r.id = ?
+        """,
+        (resume_id, user["id"], resume_id),
+    ).fetchone()
     conn.close()
-    if not resume or resume["user_id"] != user["id"] and user["role"] not in ["admin", "recruiter"]:
+    can_download = resume and (
+        resume["user_id"] == user["id"]
+        or user["role"] == "admin"
+        or (user["role"] == "recruiter" and resume["recruiter_access"])
+    )
+    if not can_download:
         flash("You do not have permission to access this resume.", "error")
         return redirect(url_for("resume_management"))
-    file_path = resume["file_path"]
-    if not os.path.exists(file_path):
+    file_path = resolve_resume_path(resume["file_path"])
+    if not file_path.is_file():
         flash("Resume file not found.", "error")
         return redirect(url_for("resume_management"))
     return send_file(file_path, as_attachment=True, download_name=resume["file_name"])
@@ -946,8 +979,9 @@ def delete_resume(resume_id):
     conn = get_db_connection()
     resume = conn.execute("SELECT * FROM resumes WHERE id = ? AND user_id = ?", (resume_id, user["id"])).fetchone()
     if resume:
-        if os.path.exists(resume["file_path"]):
-            os.remove(resume["file_path"])
+        resume_path = resolve_resume_path(resume["file_path"])
+        if resume_path.is_file():
+            resume_path.unlink()
         conn.execute("DELETE FROM resumes WHERE id = ? AND user_id = ?", (resume_id, user["id"]))
         conn.commit()
         flash("Resume deleted successfully.", "success")
@@ -962,9 +996,9 @@ def set_default_resume(resume_id):
     user = get_current_user()
     conn = get_db_connection()
     conn.execute("UPDATE resumes SET is_default = 0 WHERE user_id = ?", (user["id"],))
-    conn.execute("UPDATE resumes SET is_default = 1 WHERE id = ? AND user_id = ?", (resume_id, user["id"]))
+    updated = conn.execute("UPDATE resumes SET is_default = 1 WHERE id = ? AND user_id = ?", (resume_id, user["id"]))
     conn.commit(); conn.close()
-    flash("Default resume updated.", "success")
+    flash("Default resume updated." if updated.rowcount else "Resume not found.", "success" if updated.rowcount else "error")
     return redirect(url_for("resume_management"))
 
 
@@ -1139,7 +1173,7 @@ def interview_detail(interview_id):
     conn = get_db_connection()
     interview = conn.execute(
         """
-        SELECT i.*, a.user_id, j.title AS job_title, c.company_name
+        SELECT i.*, a.user_id, j.recruiter_id, j.title AS job_title, c.company_name
         FROM interviews i
         JOIN applications a ON a.id = i.application_id
         JOIN jobs j ON j.id = a.job_id
@@ -1149,7 +1183,12 @@ def interview_detail(interview_id):
         (interview_id,),
     ).fetchone()
     conn.close()
-    if not interview or (user["role"] == "job_seeker" and interview["user_id"] != user["id"]):
+    allowed = interview and (
+        interview["user_id"] == user["id"]
+        or user["role"] == "admin"
+        or (user["role"] == "recruiter" and interview["recruiter_id"] == user["id"])
+    )
+    if not allowed:
         flash("Interview not found.", "error")
         return redirect(url_for("interviews_page"))
     return render_template("interview_detail.html", interview=dict(interview), user=user)
@@ -1215,6 +1254,22 @@ def create_job():
     user = get_current_user()
     conn = get_db_connection()
     company_name = request.form.get("company_name", "").strip()
+    title = request.form.get("title", "").strip()
+    if not title:
+        conn.close()
+        flash("Job title is required.", "error")
+        return redirect(url_for("recruiter_jobs"))
+    try:
+        salary_min = int(request.form.get("salary_min", 0) or 0)
+        salary_max = int(request.form.get("salary_max", 0) or 0)
+    except ValueError:
+        conn.close()
+        flash("Salary values must be whole numbers.", "error")
+        return redirect(url_for("recruiter_jobs"))
+    if salary_min < 0 or salary_max < 0 or salary_max < salary_min:
+        conn.close()
+        flash("Please enter a valid salary range.", "error")
+        return redirect(url_for("recruiter_jobs"))
     company = conn.execute("SELECT * FROM companies WHERE recruiter_id = ? LIMIT 1", (user["id"],)).fetchone()
     if not company:
         # create default company if not present
@@ -1229,14 +1284,14 @@ def create_job():
         (
             company["id"],
             user["id"],
-            request.form.get("title", "").strip(),
+            title,
             request.form.get("description", "").strip(),
             request.form.get("responsibilities", "").strip(),
             request.form.get("required_skills", "").strip(),
             request.form.get("preferred_skills", "").strip(),
             request.form.get("location", "").strip(),
-            int(request.form.get("salary_min", 0) or 0),
-            int(request.form.get("salary_max", 0) or 0),
+            salary_min,
+            salary_max,
             request.form.get("employment_type", "Full Time"),
             request.form.get("workplace_type", "Hybrid"),
             request.form.get("experience_level", "Entry Level"),
@@ -1279,6 +1334,9 @@ def recruiter_applicants():
 def update_application_status(application_id):
     user = get_current_user()
     status = request.form.get("status")
+    if status not in {"applied", "under_review", "shortlisted", "interview", "selected", "rejected"}:
+        flash("Invalid application status.", "error")
+        return redirect(url_for("recruiter_applicants"))
     conn = get_db_connection()
     app = conn.execute("SELECT a.*, j.recruiter_id FROM applications a JOIN jobs j ON j.id = a.job_id WHERE a.id = ?", (application_id,)).fetchone()
     if not app or app["recruiter_id"] != user["id"]:
