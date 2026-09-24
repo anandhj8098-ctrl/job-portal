@@ -82,11 +82,12 @@ Use the login form or the demo credentials above.
 This is a Flask server, so it cannot run on GitHub Pages. Use a Python host
 such as Render, Railway, or Fly.io connected to this GitHub repository.
 
-The repository includes a root `Procfile` and `requirements.txt` for hosts
-that auto-detect them. The production command is:
+The repository includes a root `Procfile`, `requirements.txt`, and
+`render.yaml`. On Render, choose **New > Blueprint**, connect this GitHub
+repository, and select `render.yaml`. Other hosts can use this command:
 
 ```bash
-gunicorn --chdir "job portal/job portal" --bind 0.0.0.0:$PORT backend.app:app
+gunicorn --bind 0.0.0.0:$PORT app:app
 ```
 
 Set `JOBCONNECT_SECRET_KEY` to a long random value in the host environment.
